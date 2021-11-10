@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
             demoVideoPath = demoVideoFolder + "in.mp4";
 
             Log.i(Prefs.TAG, getString(R.string.app_name) + " version: " + GeneralUtils.getVersionName(getApplicationContext()) );
-            workFolder = getApplicationContext().getFilesDir().getAbsolutePath() + "/";
+            workFolder = getApplicationContext().getExternalFilesDir(demoVideoFolder).getAbsolutePath() + "/";
             //Log.i(Prefs.TAG, "workFolder: " + workFolder);
             vkLogPath = workFolder + "vk.log";
 
@@ -49,15 +49,13 @@ public class MainActivity extends AppCompatActivity {
             GeneralUtils.copyDemoVideoFromAssetsToSDIfNeeded(this, demoVideoFolder);
 
             Button invoke =  (Button)findViewById(R.id.btnExecutar);
-            invoke.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v){
-                    Log.i(Prefs.TAG, "run clicked.");
-                    if (GeneralUtils.checkIfFileExistAndNotEmpty(demoVideoPath)) {
-                        new TranscdingBackground(MainActivity.this).execute();
-                    }
-                    else {
-                        Toast.makeText(getApplicationContext(), demoVideoPath + " not found", Toast.LENGTH_LONG).show();
-                    }
+            invoke.setOnClickListener(v -> {
+                Log.i(Prefs.TAG, "run clicked.");
+                if (GeneralUtils.checkIfFileExistAndNotEmpty(demoVideoPath)) {
+                    new TranscdingBackground(MainActivity.this).execute();
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), demoVideoPath + " not found", Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -65,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i(Prefs.TAG, "License check RC: " + rc);
         }
 
-        @SuppressLint("StaticFieldLeak")
+
         public class TranscdingBackground extends AsyncTask<String, Integer, Integer>
         {
 
@@ -73,16 +71,16 @@ public class MainActivity extends AppCompatActivity {
             Activity _act;
             String commandStr;
 
-            public TranscdingBackground (Activity act) {
+            protected TranscdingBackground(Activity act) {
                 _act = act;
-            }
 
+            }
 
 
             @Override
             protected void onPreExecute() {
-                String commandStr = "-y -i " + demoVideoPath + "-strict experimental -s 480x320 -r 25 -vcodec mpeg4 -b:v 900k -ab 48000 -ac 2 -ar 22050 -an" + demoVideoFolder + "out.mp4";
-
+                String demoVideoFolderout = demoVideoFolder + "out.mp4";
+                commandStr = "-y -i " + demoVideoPath + " -strict experimental -s 480x320 -r 25 -vcodec mpeg4 -b:v 900k -ab 48000 -ac 2 -ar 22050 -an " + demoVideoFolderout;
                 progressDialog = new ProgressDialog(_act);
                 progressDialog.setMessage("FFmpeg4Android Transcoding in progress...");
                 progressDialog.show();
