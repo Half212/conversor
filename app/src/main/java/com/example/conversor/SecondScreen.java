@@ -1,20 +1,19 @@
 package com.example.conversor;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.netcompss.ffmpeg4android.CommandValidationException;
 import com.netcompss.ffmpeg4android.GeneralUtils;
@@ -22,37 +21,35 @@ import com.netcompss.ffmpeg4android.Prefs;
 import com.netcompss.loader.LoadJNI;
 
 
-public class MainActivity extends AppCompatActivity {
+public class SecondScreen extends AppCompatActivity {
 
-
-
-        String workFolder = null;
-        String demoVideoFolder = null;
-        String demoVideoPath = null;
-        String vkLogPath = null;
-        boolean commandValidationFailedFlag = false;
+    String workFolder = null;
+    String demoVideoFolder = null;
+    String demoVideoPath = null;
+    String vkLogPath = null;
+    private boolean commandValidationFailedFlag = false;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_second_screen);
 
             demoVideoFolder = Environment.getExternalStorageDirectory().getAbsolutePath() + "/videokit/";
             demoVideoPath = demoVideoFolder + "in.mp4";
 
             Log.i(Prefs.TAG, getString(R.string.app_name) + " version: " + GeneralUtils.getVersionName(getApplicationContext()) );
-            workFolder = getApplicationContext().getExternalFilesDir(demoVideoFolder).getAbsolutePath() + "/";
+            workFolder = getApplicationContext().getFilesDir().getAbsolutePath() + "/";
             //Log.i(Prefs.TAG, "workFolder: " + workFolder);
             vkLogPath = workFolder + "vk.log";
 
             GeneralUtils.copyLicenseFromAssetsToSDIfNeeded(this, workFolder);
             GeneralUtils.copyDemoVideoFromAssetsToSDIfNeeded(this, demoVideoFolder);
 
-            Button invoke =  (Button)findViewById(R.id.btnExecutar);
+            Button invoke =  (Button)findViewById(R.id.invokeButton);
             invoke.setOnClickListener(v -> {
                 Log.i(Prefs.TAG, "run clicked.");
                 if (GeneralUtils.checkIfFileExistAndNotEmpty(demoVideoPath)) {
-                    new TranscdingBackground(MainActivity.this).execute();
+                    new TranscdingBackground(SecondScreen.this).execute();
                 }
                 else {
                     Toast.makeText(getApplicationContext(), demoVideoPath + " not found", Toast.LENGTH_LONG).show();
@@ -63,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
             Log.i(Prefs.TAG, "License check RC: " + rc);
         }
 
-
         public class TranscdingBackground extends AsyncTask<String, Integer, Integer>
         {
 
@@ -71,16 +67,17 @@ public class MainActivity extends AppCompatActivity {
             Activity _act;
             String commandStr;
 
-            protected TranscdingBackground(Activity act) {
+            public TranscdingBackground (Activity act) {
                 _act = act;
-
             }
+
 
 
             @Override
             protected void onPreExecute() {
-                String demoVideoFolderout = demoVideoFolder + "out.mp4";
-                commandStr = "-y -i " + demoVideoPath + " -strict experimental -s 480x320 -r 25 -vcodec mpeg4 -b:v 900k -ab 48000 -ac 2 -ar 22050 -an " + demoVideoFolderout;
+                EditText commandText = (EditText)findViewById(R.id.cmdText);
+                commandStr = commandText.getText().toString();
+
                 progressDialog = new ProgressDialog(_act);
                 progressDialog.setMessage("FFmpeg4Android Transcoding in progress...");
                 progressDialog.show();
@@ -95,9 +92,9 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(Prefs.TAG, "vk deleted: " + isDeleted);
 
                 PowerManager powerManager = (PowerManager)_act.getSystemService(Activity.POWER_SERVICE);
-                @SuppressLint("InvalidWakeLockTag") PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "VK_LOCK");
+                @SuppressLint("InvalidWakeLockTag") WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "VK_LOCK");
                 Log.d(Prefs.TAG, "Acquire wake lock");
-                wakeLock.acquire(10*60*1000L /*10 minutes*/);
+                wakeLock.acquire();
 
                 ///////////// Set Command using code (overriding the UI EditText) /////
                 //commandStr = "ffmpeg -y -i /sdcard/videokit/in.mp4 -strict experimental -s 320x240 -r 30 -aspect 3:4 -ab 48000 -ac 2 -ar 22050 -vcodec mpeg4 -b 2097152 /sdcard/videokit/out.mp4";
@@ -163,17 +160,22 @@ public class MainActivity extends AppCompatActivity {
                     rc = GeneralUtils.getReturnCodeFromLog(vkLogPath);
                 }
                 final String status = rc;
-                MainActivity.this.runOnUiThread(new Runnable() {
+                SecondScreen.this.runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(MainActivity.this, status, Toast.LENGTH_LONG).show();
+                        Toast.makeText(SecondScreen.this, status, Toast.LENGTH_LONG).show();
                         if (status.equals("Transcoding Status: Failed")) {
-                            Toast.makeText(MainActivity.this, "Check: " + vkLogPath + " for more information.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(SecondScreen.this, "Check: " + vkLogPath + " for more information.", Toast.LENGTH_LONG).show();
                         }
                     }
                 });
             }
+            public void passavalor(){
+                EditText commandText = (EditText)findViewById(R.id.cmdText);
+                commandStr = commandText.getText().toString();
 
+            }
         }
 
 
     }
+

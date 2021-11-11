@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/conversor.iml" filepath="$PROJECT_DIR$/.idea/modules/conversor.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/conversor.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/conversor.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sse/conversor.sse.iml" filepath="$PROJECT_DIR$/.idea/modules/sse/conversor.sse.iml" />
     </modules>
   </component>
 </project>

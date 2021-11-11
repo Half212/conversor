@@ -4,6 +4,10 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/Desenvolvimento/AndroidStudioProjects/conversor/app/src/main/res/layout/activity_main.xml" value="0.22" />
+        <entry key="..\:/Users/Desenvolvimento/AndroidStudioProjects/conversor/app/src/main/res/layout/activity_main2.xml" value="0.18229166666666666" />
+        <entry key="..\:/Users/Desenvolvimento/AndroidStudioProjects/conversor/app/src/main/res/layout/activity_second_screen.xml" value="0.33" />
+        <entry key="..\:/Users/Desenvolvimento/AndroidStudioProjects/conversor/sse/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/Desenvolvimento/AndroidStudioProjects/conversor/sse/src/src/main/res/layout/activity_main.xml" value="0.1" />
       </map>
     </option>
   </component>
